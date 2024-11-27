@@ -1,0 +1,172 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section>
+
+        <h2 class="text-center mb-4">Crear Técnico</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                    <div class="mb-3">
+                        <div id="map" style="height: 500px; width: 100%; border: 2px solid black;"></div>
+                    </div>
+                        <form id="createTechnicianForm" action="registro/tecnico" method="POST">
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="apellido" class="form-label">Apellido</label>
+                                <input type="text" class="form-control" id="apellido" name="apellido" required>
+                            </div>
+                           <div class="mb-3">
+                                <label for="usuario" class="form-label">Usuario</label>
+                                <input type="text" class="form-control" id="usuario" name="usuario" required>
+                            </div>
+                           <div class="mb-3">
+                                <label for="contrasenia" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="contrasenia" name="contrasenia" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
+                                <select class="form-select" id="tipoDocumento" name="tipoDocumento"   required>
+                                    <option value="">Seleccionar</option>
+                                    <option value="DNI">DNI</option>
+                                    <option value="LE">LE</option>
+                                    <option value="LC">LC</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cuil" class="form-label">CUIL</label>
+                                <input type="text" class="form-control" id="cuil" name="cuil" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="contactoTipo" class="form-label">Medio de Contacto</label>
+                                <select class="form-select" id="contactoTipo" name="medioDeContacto.tipo" required>
+                                    <option value="">Seleccionar</option>
+                                    <option value="WHATSAPP">Whatsapp</option>
+                                    <option value="EMAIL">Email</option>
+                                </select>
+                            </div>
+                            <div class="mb-3" id="contactoValueDiv" >
+                            </div>
+
+                             <div class="mb-3">
+                                <label for="localidad" class="form-label">Nombre de la Localidad</label>
+                                <input type="text" class="form-control" id="localidad" name="localidad" required>
+                                <label for="latitud" class="form-label">Latitud</label>
+                                <input type="text" class="form-control" id="latitud" name="latitud" required>
+                                <label for="longitud" class="form-label">Longitud</label>
+                                <input type="text" class="form-control" id="longitud" name="longitud" required>
+                            </div>
+
+                            <button id="submitButtonTecnico" type="submit" class="btn btn-primary">Crear Técnico</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <script>
+        const contactoTipoSelect = document.getElementById('contactoTipo');
+        const contactoValueDiv = document.getElementById('contactoValueDiv');
+
+        contactoTipoSelect.addEventListener('change', function () {
+            const selectedValue = this.value;
+            contactoValueDiv.innerHTML = '';
+
+            if (selectedValue === 'WHATSAPP') {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.class = 'form-control';
+                input.id = 'contactoValor';
+                input.name = 'medioDeContacto.valor';
+                input.placeholder = 'Ingrese número de Whatsapp';
+                input.required = true;
+                contactoValueDiv.appendChild(input);
+            } else if (selectedValue === 'EMAIL') {
+                const input = document.createElement('input');
+                input.type = 'email';
+                input.class = 'form-control';
+                input.id = 'contactoValor';
+                input.name = 'medioDeContacto.valor';
+                input.placeholder = 'Ingrese dirección de email';
+                input.required = true;
+                contactoValueDiv.appendChild(input);
+            }
+        });
+
+        const form = document.getElementById('createTechnicianForm');
+        const submitButton = document.getElementById('submitButtonTecnico');
+
+        submitButton.addEventListener('click', function (event) {
+            // Previene el comportamiento por defecto del botón de envío
+            event.preventDefault();
+
+            // Modifica la acción (URL) del formulario si contiene "/registro/registro"
+            if (form.action.includes("/registro/registro/tecnico")) {
+               form.action = form.action.replace("/registro/registro/tecnico", "/registro/tecnico");
+            }
+
+            // Envía el formulario manualmente después de modificar la acción
+            form.submit();
+        });
+let map;
+
+        function initMap() {
+            const mapOptions = {
+                center: { lat: -34.6078, lng: -58.4462 }, // Coordenadas iniciales
+                zoom: 12.3,
+            };
+
+            // Crear el mapa en el elemento con id "map"
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            // Agregar evento de clic en el mapa
+            map.addListener('click', (event) => {
+                const lat = event.latLng.lat();
+                const lng = event.latLng.lng();
+                const latInput = document.getElementById('latitud');
+                const lngInput = document.getElementById('longitud');
+                latInput.value = lat;
+                lngInput.value = lng;
+
+                // Llama a la función para obtener y mostrar el nombre de localidad y provincia
+                getAddress(lat, lng);
+            });
+        }
+
+        async function getAddress(lat, lng) {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data && data.address) {
+                    // Obtener el nombre de la localidad y de la provincia
+                    const locality = data.address.neighbourhood || data.address.suburb || data.address.city || data.address.town || data.address.village || "Localidad no encontrada";
+
+                    // Completar los campos de localidad y provincia en el formulario
+                    document.getElementById('localidad').value = locality;
+                } else {
+                    // Manejo de caso en el que no se encuentra la dirección
+                    document.getElementById('localidad').value = "localidad no encontrada";
+                }
+            } catch (error) {
+                console.error("Error al obtener la dirección:", error);
+                // Manejo de error en caso de que la solicitud falle
+                document.getElementById('localidad').value = "Error al obtener la lkocalidad";
+            }
+        }
+
+        initMap();
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap" async defer></script>
+
+{{/block}}

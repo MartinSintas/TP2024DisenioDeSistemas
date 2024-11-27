@@ -1,0 +1,131 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section class="container mt-5">
+        <h1 class="mb-4">Gestión de Personas Humanas</h1>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Tipo de Documento</th>
+                <th>Nro. Documento</th>
+                <th>Medios de Contacto</th>
+                <th>Formas de Colaborar</th>
+                <th>Dirección</th>
+                <th>Puntos Acumulados</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Ejemplo de persona humana 1 -->
+            <tr>
+                <td>1</td>
+                <td>Juan</td>
+                <td>Pérez</td>
+                <td>DNI</td>
+                <td>12345678</td>
+                <td>juan@email.com, 1123456789</td>
+                <td>DONACION_VIANDAS, DISTRIBUCION_VIANDAS</td>
+                <td>Av. Rivadavia 1234, CABA</td>
+                <td>1500</td>
+                <td>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#editPersonModal">Editar
+                    </button>
+                    <button class="btn btn-sm btn-danger">Eliminar</button>
+                </td>
+            </tr>
+            <!-- Ejemplo de persona humana 2 -->
+            <tr>
+                <td>2</td>
+                <td>María</td>
+                <td>González</td>
+                <td>PASAPORTE</td>
+                <td>AB123456</td>
+                <td>maria@email.com</td>
+                <td>DONACION_DINERO, REGISTRO_PERSONAS_VULNERABLES</td>
+                <td>Calle 123, La Plata</td>
+                <td>2300</td>
+                <td>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#editPersonModal">Editar
+                    </button>
+                    <button class="btn btn-sm btn-danger">Eliminar</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Modal para editar persona humana -->
+        <div class="modal fade" id="editPersonModal" tabindex="-1" aria-labelledby="editPersonModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editPersonModalLabel">Editar Persona Humana</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editPersonForm">
+                            <input type="hidden" id="editPersonId" value="1">
+                            <div class="mb-3">
+                                <label for="editNombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="editNombre" value="Juan" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editApellido" class="form-label">Apellido</label>
+                                <input type="text" class="form-control" id="editApellido" value="Pérez" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editTipoDocumento" class="form-label">Tipo de Documento</label>
+                                <select class="form-select" id="editTipoDocumento" required>
+                                    <option value="DNI" selected>DNI</option>
+                                    <option value="PASAPORTE">Pasaporte</option>
+                                    <option value="CEDULA">Cédula</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editNroDocumento" class="form-label">Nro. Documento</label>
+                                <input type="text" class="form-control" id="editNroDocumento" value="12345678"
+                                       required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMediosContacto" class="form-label">Medios de Contacto</label>
+                                <input type="text" class="form-control" id="editMediosContacto"
+                                       value="juan@email.com, 1123456789">
+                                <small class="form-text text-muted">Separar múltiples medios con comas</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editFormasColaborar" class="form-label">Formas de Colaborar</label>
+                                <select class="form-select" id="editFormasColaborar" multiple>
+                                    <option value="DONACION_DINERO">Donación de Dinero</option>
+                                    <option value="REGISTRO_PERSONAS_VULNERABLES">Registro de Personas Vulnerables
+                                    </option>
+                                    <option value="DONACION_VIANDAS" selected>Donación de Viandas</option>
+                                    <option value="DISTRIBUCION_VIANDAS" selected>Distribución de Viandas</option>
+                                </select>
+                                <small class="form-text text-muted">Mantener Ctrl presionado para seleccionar múltiples
+                                    opciones</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editDireccion" class="form-label">Dirección</label>
+                                <input type="text" class="form-control" id="editDireccion"
+                                       value="Av. Rivadavia 1234, CABA">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editPuntosAcumulados" class="form-label">Puntos Acumulados</label>
+                                <input type="number" class="form-control" id="editPuntosAcumulados" value="1500"
+                                       required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary">Guardar cambios</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{{/block}}

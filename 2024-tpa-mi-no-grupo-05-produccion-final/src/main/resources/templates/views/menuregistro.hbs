@@ -1,0 +1,40 @@
+{{> templates/base }}
+{{#block "contenido"}}
+    <section>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Regístrate</h4>
+                            <p class="card-text">
+                                Los <span class="fw-bold text-decoration-underline">particulares</span> pueden
+                                colaborar
+                                <span class="fw-bold">donando viandas</span>,
+                                <span class="fw-bold">redistribuyéndolas</span>, ayudando con el
+                                <span class="fw-bold">registro de personas vulnerables</span>
+                                o <span class="fw-bold">donando dinero</span>.
+                            </p>
+                            <p class="card-text">
+                                Las <span class="fw-bold text-decoration-underline">organizaciones</span> pueden
+                                colaborar
+                                <span class="fw-bold">colocando heladeras</span>, ofreciendo
+                                <span class="fw-bold">productos y servicios</span> para el
+                                <span class="text-decoration-underline">canje de puntos</span> y
+                                <span class="fw-bold">donando dinero</span>.
+                            </p>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <a href="/registro/persona-humana" class="card-link">Soy un particular</a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="/registro/persona-juridica" class="card-link">Represento una organización</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{{/block}}

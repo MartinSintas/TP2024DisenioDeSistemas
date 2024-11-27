@@ -1,0 +1,44 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section class="container mt-5">
+        <h1 class="mb-4">Canje de Ofertas</h1>
+
+        <div class="alert alert-info mb-4">
+            <h4 class="alert-heading">Tus Puntos</h4>
+            <p class="mb-0">Actualmente tienes <strong id="userPoints">{{puntos}}</strong> puntos disponibles.</p>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {{#if ofertas}}
+                {{#each ofertas}}
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="/imagenes/{{this.imagen}}" class="card-img-top" alt="{{this.nombre}}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{this.nombre}}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{this.subTitulo}}</h6>
+                                <p class="card-text">{{this.descripcion}}</p>
+                                <p class="card-text"><small class="text-muted">{{this.rubro.nombre}}</small></p>
+                            </div>
+                            <div class="card-footer">
+                                <form id="canjear-form-{{this.id}}" action="/canjear-ofertas" method="POST">
+                                    <input type="hidden" name="ofertaId" value="{{this.id}}">
+                                    <input type="hidden" name="puntosNecesarios" value="{{this.puntosNecesarios}}">
+                                    <button class="btn btn-primary" type="submit">
+                                        Canjear por {{this.puntosNecesarios}} puntos
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            {{else}}
+                <div class="col">
+                    <div class="alert alert-warning" role="alert">
+                        No hay ofertas disponibles para canjear.
+                    </div>
+                </div>
+            {{/if}}
+        </div>
+    </section>
+{{/block}}

@@ -1,0 +1,191 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section class="container mt-5">
+        <h1 class="mb-4">Mapa de Heladeras</h1>
+        <div class="row">
+            <div class="col-md-8">
+                <div id="map" style="height: 500px; width: 100%;"></div>
+            </div>
+            <div class="col-md-4">
+                <div id="fridgeInfo" class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Información de la Heladera seleccionada</h5>
+                        <p id="fridgeName"></p>
+                        <p id="fridgeStatus"></p>
+                        <p id="fridgeCapacity"></p>
+
+                        <!-- Formulario de suscripción -->
+                        <form action="/suscribirse-heladera" method="POST" id="subscribeForm" style="display: none;">
+                            <input type="hidden" id="fridgeId" name="fridgeId">
+                            <div class="mb-3">
+                                <label for="subscriptionType" class="form-label">Tipo de Suscripción</label>
+                                <select class="form-select" id="subscriptionType" name="subscriptionType" required>
+                                    <option value="">Seleccione un tipo</option>
+                                    <option value="FALTAN_VIANDAS">Pocas viandas disponibles</option>
+                                    <option value="HAY_VIANDAS">Heladera casi llena</option>
+                                    <option value="INCIDENTE">Incidentes</option>
+                                </select>
+                            </div>
+                            <div class="mb-3" id="criticalNumberContainer" style="display: none;">
+                                <label for="criticalNumber" class="form-label">Número Crítico a notificar</label>
+                                <input type="number" class="form-control" id="criticalNumber" name="criticalNumber"
+                                       min="1">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Suscribirse</button>
+                        </form>
+
+                        <div id="alertInfo" class="alert alert-warning mt-3" style="display: none;"></div>
+
+                        <!-- Formulario de redistribución -->
+                        <form action="/redistribuir" method="POST" id="redistributionForm" style="display: none;">
+                            <h6>Sugerencia de Redistribución:</h6>
+                            <ul id="suggestedFridges"></ul>
+                            <input type="hidden" id="sourceFridgeId" name="sourceFridgeId">
+                            <input type="hidden" id="targetFridgeIds" name="targetFridgeIds">
+                            <button type="submit" class="btn btn-success">Aceptar Sugerencia</button>
+                        </form>
+                        <button id="rejectSuggestion" class="btn btn-danger mt-2" style="display: none;">Rechazar
+                            Sugerencia
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Datos de las heladeras pasados desde el servidor
+        const fridges = {{{json heladeras}}};
+    </script>
+
+    <script>
+        (g => {
+            var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
+                    m = document, b = window;
+            b = b[c] || (b[c] = {});
+            var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
+                    u = () => h || (h = new Promise(async (f, n) => {
+                        await (a = m.createElement("script"));
+                        e.set("libraries", [...r] + "");
+                        for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                        e.set("callback", c + ".maps." + q);
+                        a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                        d[q] = f;
+                        a.onerror = () => h = n(Error(p + " could not load."));
+                        a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                        m.head.append(a)
+                    }));
+            d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+        })({key: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg", v: "weekly"});
+
+        let map;
+        let markers = {};
+
+        async function initMap() {
+            const {Map} = await google.maps.importLibrary("maps");
+            const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
+
+            map = new Map(document.getElementById("map"), {
+                center: {lat: -34.6078, lng: -58.4462},
+                zoom: 12.3,
+                mapId: "4504f8b37365c3d0"
+            });
+
+            fridges.forEach(fridge => {
+                const marker = new AdvancedMarkerElement({
+                    map,
+                    position: {lat: parseFloat(fridge.latitude), lng: parseFloat(fridge.longitude)},
+                    title: fridge.name,
+                    content: createMarkerContent(fridge)
+                });
+
+                marker.addListener('click', () => showFridgeInfo(fridge));
+                markers[fridge.id] = marker;
+            });
+        }
+
+        function getMarkerIcon(status) {
+            const iconBase = 'http://maps.google.com/mapfiles/ms/icons/';
+            switch (status) {
+                case 'ACTIVA':
+                    return iconBase + 'green-dot.png';
+                case 'DESCOMPUESTA':
+                    return iconBase + 'red-dot.png';
+                case 'ALERTA_MOVIMIENTO':
+                    return iconBase + 'yellow-dot.png';
+                case 'FALLA_CONEXION':
+                    return iconBase + 'orange-dot.png';
+                case 'INACTIVA':
+                    return iconBase + 'blue-dot.png';
+                default:
+                    return iconBase + 'purple-dot.png';
+            }
+        }
+
+        function createMarkerContent(fridge) {
+            const content = document.createElement('div');
+            content.classList.add('marker');
+            content.innerHTML = `<div style="background-color: ${getStatusColor(fridge.status)}; width: 20px; height: 20px; border-radius: 50%;"></div>`;
+            return content;
+        }
+
+        function getStatusColor(status) {
+            switch (status) {
+                case 'ACTIVA':
+                    return 'green';
+                case 'DESCOMPUESTA':
+                    return 'red';
+                case 'ALERTA_MOVIMIENTO':
+                    return 'yellow';
+                case 'FALLA_CONEXION':
+                    return 'orange';
+                case 'INACTIVA':
+                    return 'blue';
+                default:
+                    return 'purple';
+            }
+        }
+
+        function showFridgeInfo(fridge) {
+            document.getElementById('fridgeName').textContent = `Nombre: ${fridge.name}`;
+            document.getElementById('fridgeStatus').textContent = `Estado: ${fridge.status}`;
+            document.getElementById('fridgeCapacity').textContent = `Capacidad: ${fridge.currentMeals}/${fridge.capacity}`;
+
+            const subscribeForm = document.getElementById('subscribeForm');
+            subscribeForm.style.display = 'block';
+            document.getElementById('fridgeId').value = fridge.id;
+
+            const alertInfo = document.getElementById('alertInfo');
+            alertInfo.style.display = 'none';
+
+            const redistributionForm = document.getElementById('redistributionForm');
+            redistributionForm.style.display = 'none';
+            document.getElementById('rejectSuggestion').style.display = 'none';
+
+            if (fridge.status === 'DESCOMPUESTA') {
+                alertInfo.textContent = 'Esta heladera está descompuesta. Se sugiere redistribuir las viandas.';
+                alertInfo.style.display = 'block';
+            } else if (fridge.currentMeals <= 10) {
+                alertInfo.textContent = `Quedan solo ${fridge.currentMeals} viandas disponibles. Se sugiere reposición.`;
+                alertInfo.style.display = 'block';
+            } else if (fridge.currentMeals >= fridge.capacity - 10) {
+                alertInfo.textContent = `Faltan ${fridge.capacity - fridge.currentMeals} espacios para llenar la heladera.`;
+                alertInfo.style.display = 'block';
+            }
+        }
+
+        // Nuevo código para manejar la visibilidad del campo de número crítico
+        document.getElementById('subscriptionType').addEventListener('change', function () {
+            const criticalNumberContainer = document.getElementById('criticalNumberContainer');
+            if (this.value === 'HAY_VIANDAS' || this.value === 'FALTAN_VIANDAS') {
+                criticalNumberContainer.style.display = 'block';
+                document.getElementById('criticalNumber').required = true;
+            } else {
+                criticalNumberContainer.style.display = 'none';
+                document.getElementById('criticalNumber').required = false;
+            }
+        });
+
+        initMap();
+    </script>
+{{/block}}

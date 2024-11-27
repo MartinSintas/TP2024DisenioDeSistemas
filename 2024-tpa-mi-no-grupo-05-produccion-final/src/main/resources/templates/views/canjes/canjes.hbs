@@ -1,0 +1,39 @@
+{{> templates/base }}
+{{#block "contenido"}}
+    <div class="container mt-5">
+        <h2 class="mb-4">Historial de Canjes</h2>
+
+        {{#if canjes.length}}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Oferta</th>
+                        <th scope="col">Puntos Utilizados</th>
+                        <th scope="col">Fecha del Canje</th>
+                        <th scope="col">Rubro</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{#each canjes}}
+                        <tr>
+                            <th scope="row">{{@index}}</th>
+                            <td>{{this.oferta.nombre}}</td>
+                            <td>{{this.puntosUtilizados}}</td>
+                            <td>{{this.fecha}}</td>
+                            <td>{{this.oferta.rubro.nombre}}</td>
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        {{else}}
+            <div class="alert alert-warning" role="alert">
+                Aún no has realizado ningún canje.
+            </div>
+        {{/if}}
+
+        <a href="/canjear-ofertas" class="btn btn-primary mt-3">Volver a Ofertas</a>
+    </div>
+{{/block}}

@@ -1,0 +1,39 @@
+@startuml
+class SuscripcionHeladera {
+-personaHumana: PersonaHumana
+-heladera: Heladera
+-tipoSuscripcion: TipoSuscripcion
+
++cumpleCondicion(): Boolean
++notificar(): void
+}
+
+abstract class TipoSuscripcion {
++abstract cumpleCondicion(): Boolean
++notificar(heladera: Heladera, colaborador: PersonaHumana): void
++abstract notificacionAEnviar(Heladera heladera): Notificacion
+}
+
+class FaltanViandas extends TipoSuscripcion {
+-numeroCritico: Integer
+
++cumpleCondicion(heladera: Heladera): Boolean
++notificacionAEnviar(heladera: Heladera): Notificacion
+}
+
+class HayViandas extends TipoSuscripcion {
+-numeroCritico: Integer
+
++cumpleCondicion(heladera: Heladera): Boolean
++notificacionAEnviar(heladera: Heladera): Notificacion
+}
+
+SuscripcionHeladera --> TipoSuscripcion
+
+class NotificadorSuscripcionesHeladeras {
++notificarSuscripciones(heladera: Heladera): void
+}
+
+NotificadorSuscripcionesHeladeras ..> SuscripcionHeladera
+
+@enduml

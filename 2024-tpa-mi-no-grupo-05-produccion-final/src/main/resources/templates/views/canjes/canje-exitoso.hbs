@@ -1,0 +1,26 @@
+{{> templates/base }}
+{{#block "contenido"}}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card text-center">
+                    <div class="card-header bg-success text-white">
+                        ¡Canje Exitoso!
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Has canjeado exitosamente tu oferta</h5>
+                        <p class="card-text">
+                            ¡Gracias por utilizar nuestros servicios! Has canjeado la oferta
+                            <strong>{{oferta.nombre}}</strong> por <strong>{{canje.puntosUtilizados}}</strong> puntos.
+                        </p>
+                        <p class="card-text"><small class="text-muted">{{oferta.rubro.nombre}}</small></p>
+                        <a href="/canjear-ofertas" class="btn btn-primary">Volver a las ofertas</a>
+                    </div>
+                    <div class="card-footer text-muted">
+                        Canje realizado el {{canje.fecha}}.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{{/block}}

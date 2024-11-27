@@ -1,0 +1,340 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section class="container mt-5">
+        <h1 class="mb-4">Registro de Heladeras</h1>
+        <div class="row">
+            <div class="col-md-8">
+                <div id="map" style="height: 500px; width: 100%; border: 2px solid black;"></div>
+            </div>
+            <div class="col-md-4">
+                <div id="fridgeRegistrationForm" class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Registrar Nueva Heladera</h5>
+                        <form action="/registro/heladera" method="POST" id="createFridgeForm">
+                            <div class="mb-3">
+                                <label for="fridgeName" class="form-label">Nombre de la Heladera</label>
+                                <input type="text" class="form-control" id="fridgeName" name="fridgeName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fridgeCapacity" class="form-label">Cantidad máxima de viandas</label>
+                                <input type="number" class="form-control" id="fridgeCapacity" name="fridgeCapacity" min="1" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fridgeModel" class="form-label">Modelo de la Heladera</label>
+                                <div class="input-group">
+                                    <select class="form-select" id="fridgeModel" name="fridgeModel" required>
+                                        <option value=""></option>
+                                        {{#each fridgeModel}}
+                                            <option value="{{this.id}}">{{this.detalle}}</option> <!-- Usar "id" como value -->
+                                        {{/each}}
+                                    </select>
+                                    <button class="btn btn-secondary" type="button" onclick="window.location.href='/registro/modelo-heladera';">
+                                        Otro
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fridgeAddress" class="form-label">Dirección</label>
+                                <input type="text" class="form-control" id="fridgeAddress" name="direccion" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fridgeAddress" class="form-label">Localidad</label>
+                                <input type="text" class="form-control" id="localidad" name="localidad" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fridgeLatitude" class="form-label">Latitud</label>
+                                <input type="text" class="form-control" id="fridgeLatitude" name="fridgeLatitude" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fridgeLongitude" class="form-label">Longitud</label>
+                                <input type="text" class="form-control" id="fridgeLongitude" name="fridgeLongitude" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            </div>
+                            <input type="hidden" id="fridgeStartDate" name="fridgeStartDate">
+                            <button type="submit" class="btn btn-primary">Registrar Heladera</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Inicializa el mapa
+        let map;
+
+        function initMap() {
+            const mapOptions = {
+                center: {lat: -34.6078, lng: -58.4462}, // Coordenadas iniciales
+                zoom: 12.3,
+            };
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            // Agregar un evento de clic al mapa para seleccionar la ubicación
+            map.addListener('click', (event) => {
+                const lat = event.latLng.lat();
+                const lng = event.latLng.lng();
+                document.getElementById('fridgeLatitude').value = lat;
+                document.getElementById('fridgeLongitude').value = lng;
+                // Se puede usar una API para obtener la dirección basada en lat y lng
+                getAddress(lat, lng);
+            });
+
+            // Obtener los puntos populares y mostrarlos en el mapa
+            getPopularSpots();
+            getRecommendedZones();
+        }
+
+        async function getRecommendedZones() {
+            const overpassUrl = "https://overpass-api.de/api/interpreter?data=[out:json];node(around:10000,-34.6078,-58.4462)[amenity];out;";
+
+            try {
+                const response = await fetch(overpassUrl);
+                const data = await response.json();
+
+                const randomMaxZones = getRandomInt(5, 20); // Limitar entre 5 y 20
+                const zones = processZoneData(data.elements, randomMaxZones);
+
+                zones.forEach(zone => {
+                    const polygon = new google.maps.Polygon({
+                        paths: zone.coords,
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        fillColor: '#FF0000',
+                        fillOpacity: 0.35,
+                    });
+
+                    polygon.setMap(map);
+
+                    // Agregar evento para mostrar el nombre de la zona al hacer clic
+                    google.maps.event.addListener(polygon, 'click', () => {
+                        alert(`Recomendación: ${zone.name}`);
+                    });
+                });
+            } catch (error) {
+                console.error("Error al obtener las zonas de recomendación:", error);
+            }
+        }
+
+        function processZoneData(elements, maxZones) {
+            const zones = [];
+            const proximityThreshold = 0.05;
+
+            elements.forEach(element => {
+                const lat = element.lat || element.center.lat;
+                const lon = element.lon || element.center.lon;
+                let foundZone = false;
+
+                zones.forEach(zone => {
+                    const zoneCenter = zone.coords[0];
+                    if (getDistance(lat, lon, zoneCenter.lat, zoneCenter.lng) < proximityThreshold) {
+                        zone.coords.push({ lat, lng: lon });
+                        foundZone = true;
+                    }
+                });
+
+                if (!foundZone && zones.length < maxZones) {
+                    zones.push({
+                        coords: [{ lat, lng: lon }],
+                        name: `Zona ${zones.length + 1}`
+                    });
+                }
+            });
+
+            // Filtrar zonas con al menos 3 puntos
+            const filteredZones = zones.filter(zone => zone.coords.length >= 3);
+            console.log("Zonas generadas:", filteredZones); // Agregar esta línea para depuración
+
+            return filteredZones.map(zone => ({
+                coords: simplifyZoneCoords(zone.coords),
+                name: zone.name
+            }));
+        }
+
+        function simplifyZoneCoords(coords) {
+            // Asegurémonos de que tenemos al menos 3 puntos para formar un polígono
+            if (coords.length < 3) {
+                return coords; // No se puede formar un polígono
+            }
+
+            // Obtener los extremos (el punto más a la izquierda)
+            const leftmost = coords.reduce((prev, current) => {
+                return (current.lng < prev.lng) ? current : prev;
+            });
+
+            const sortedCoords = coords.slice().sort((a, b) => {
+                // Ordenar por ángulo respecto al punto más a la izquierda
+                const angleA = Math.atan2(a.lat - leftmost.lat, a.lng - leftmost.lng);
+                const angleB = Math.atan2(b.lat - leftmost.lat, b.lng - leftmost.lng);
+                return angleA - angleB;
+            });
+
+            // Usar el algoritmo de "convex hull" de Andrew para obtener el polígono
+            const lower = [];
+            for (const point of sortedCoords) {
+                while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], point) <= 0) {
+                    lower.pop();
+                }
+                lower.push(point);
+            }
+
+            const upper = [];
+            for (let i = sortedCoords.length - 1; i >= 0; i--) {
+                const point = sortedCoords[i];
+                while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], point) <= 0) {
+                    upper.pop();
+                }
+                upper.push(point);
+            }
+
+            // Eliminar el último punto porque es el mismo que el primero
+            upper.pop();
+            return [...lower, ...upper]; // Combinar las partes superior e inferior
+        }
+
+        // Función auxiliar para calcular el producto cruzado
+        function cross(o, a, b) {
+            return (a.lng - o.lng) * (b.lat - o.lat) - (a.lat - o.lat) * (b.lng - o.lng);
+        }
+
+
+        // Función para calcular la distancia entre dos puntos geográficos
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radio de la Tierra en km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distancia en km
+        }
+
+        // Convierte grados a radianes
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        const polygon = new google.maps.Polygon({
+            paths: zone.coords,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0, // Asegúrate de que sea visible
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.5, // Ajustar para ver el interior del polígono
+        });
+
+        // Función para obtener la dirección usando Nominatim (OpenStreetMap)
+        async function getAddress(lat, lng) {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data && data.address) {
+                    const address = data.display_name;
+                    document.getElementById('fridgeAddress').value = address;
+                    const locality = data.address.neighbourhood || data.address.suburb || data.address.city || data.address.town || data.address.village || "Localidad no encontrada";
+                    document.getElementById('localidad').value = locality;
+                } else {
+                    document.getElementById('fridgeAddress').value = "Dirección no encontrada";
+                }
+            } catch (error) {
+                console.error("Error al obtener la dirección:", error);
+                document.getElementById('fridgeAddress').value = "Error al obtener la dirección";
+            }
+        }
+
+        async function getPopularSpots() {
+            const overpassUrl = "https://overpass-api.de/api/interpreter?data=[out:json];node(around:5000,-34.6078,-58.4462)[amenity];out;";
+
+            try {
+                const response = await fetch(overpassUrl);
+                const data = await response.json();
+
+                function getRandomInt(min, max) {
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+                }
+                 const randomMaxSpots = getRandomInt(5, 20);
+
+                // Filtrar los resultados para obtener como máximo 100 puntos dispersos
+                const filteredSpots = filterSpots(data.elements, randomMaxSpots, 0.005); // Cambiado a 100
+
+                filteredSpots.forEach(spot => {
+                    const marker = new google.maps.Marker({
+                        position: { lat: spot.lat, lng: spot.lon },
+                        map: map,
+                        title: spot.tags.amenity || 'Sitio desconocido'
+                    });
+
+                    const infoWindowContent = `
+                        <div>
+                            <strong>${spot.tags.amenity || 'Sitio desconocido'}</strong><br>
+                            <p>${spot.tags.name || 'Sin nombre'}</p>
+                        </div>`;
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: infoWindowContent
+                    });
+
+                    marker.addListener('click', () => {
+                        infoWindow.open(map, marker);
+                    });
+                });
+            } catch (error) {
+                console.error("Error al obtener los puntos de interés populares:", error);
+            }
+        }
+
+        // Filtrar los puntos dispersos
+        function filterSpots(spots, maxSpots, minDistance) {
+            const selectedSpots = [];
+            const addedCoords = [];
+
+            for (const spot of spots) {
+                // Verifica si el spot está a una distancia mínima de los spots ya seleccionados
+                if (selectedSpots.length < maxSpots) {
+                    const { lat, lon } = spot;
+                    if (!addedCoords.some(coords => getDistance(lat, lon, coords.lat, coords.lng) < minDistance)) {
+                        selectedSpots.push(spot);
+                        addedCoords.push({ lat, lng: lon }); // Guardamos las coordenadas de los spots seleccionados
+                    }
+                } else {
+                    break; // Ya alcanzamos el número máximo de puntos
+                }
+            }
+
+            return selectedSpots;
+        }
+
+        // Función para calcular la distancia entre dos puntos geográficos
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radio de la Tierra en km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distancia en km
+        }
+                // Convierte grados a radianes
+                function deg2rad(deg) {
+                    return deg * (Math.PI / 180);
+                }
+
+                // Inicializar el mapa cuando se cargue la página
+                window.initMap = initMap;
+
+        initMap();
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap" async defer></script>
+{{/block}}

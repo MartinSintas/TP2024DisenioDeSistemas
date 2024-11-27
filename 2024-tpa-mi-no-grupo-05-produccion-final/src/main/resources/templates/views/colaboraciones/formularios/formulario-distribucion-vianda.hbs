@@ -1,0 +1,160 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section class="container my-5">
+        <h2 class="text-center mb-4">Redistribución de Viandas</h2>
+        <div class="row">
+            <!-- Columna del mapa -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Selecciona las Heladeras</h5>
+                        <div class="btn-group w-100 mb-3" role="group" aria-label="Selección de heladera">
+                            <input type="radio" class="btn-check" name="fridgeSelection" id="selectOrigin"
+                                   autocomplete="off" checked>
+                            <label class="btn btn-outline-primary" for="selectOrigin">Seleccionar Origen</label>
+                            <input type="radio" class="btn-check" name="fridgeSelection" id="selectDestination"
+                                   autocomplete="off">
+                            <label class="btn btn-outline-primary" for="selectDestination">Seleccionar
+                                Destino</label>
+                        </div>
+                        <div id="map" style="height: 400px; width: 100%;"></div>
+                        <div class="mt-3">
+                            <p class="mb-1"><strong>Heladera origen:</strong> <span
+                                    id="selectedOrigin">Ninguna</span></p>
+                            <p class="mb-1"><strong>Heladera destino:</strong> <span
+                                    id="selectedDestination">Ninguna</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna del formulario -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Detalles de la Redistribución</h5>
+                        <form action="/redistribucion-viandas" method="POST">
+                            <!-- Campos ocultos para IDs de heladeras -->
+                            <input type="hidden" id="originFridgeId" name="originFridgeId" required>
+                            <input type="hidden" id="destinationFridgeId" name="destinationFridgeId" required>
+
+                            <!-- Heladera origen (solo lectura) -->
+                            <div class="mb-3">
+                                <label for="originFridge" class="form-label">Heladera Origen</label>
+                                <input type="text" class="form-control" id="originFridge" name="originFridge"
+                                       readonly required>
+                            </div>
+
+                            <!-- Heladera destino (solo lectura) -->
+                            <div class="mb-3">
+                                <label for="destinationFridge" class="form-label">Heladera Destino</label>
+                                <input type="text" class="form-control" id="destinationFridge"
+                                       name="destinationFridge" readonly required>
+                            </div>
+
+                            <!-- Cantidad de viandas -->
+                            <div class="mb-3">
+                                <label for="viandaCount" class="form-label">Cantidad de Viandas a Mover</label>
+                                <input type="number" class="form-control" id="viandaCount" name="viandaCount"
+                                       min="1" required>
+                            </div>
+
+                            <!-- Motivo de la distribución -->
+                            <div class="mb-3">
+                                <label for="redistributionReason" class="form-label">Motivo de la
+                                    Redistribución</label>
+                                <select class="form-select" id="redistributionReason" name="redistributionReason"
+                                        required>
+                                    <option value="SIN_MOTIVO">Selecciona un motivo</option>
+                                    <option value="DESPERFECTO_HELADERA">Desperfecto en la heladera origen</option>
+                                    <option value="BAJO_STOCK">Falta de viandas en la heladera destino</option>
+                                </select>
+                            </div>
+
+                            <!-- Botón de envío -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Realizar Redistribución</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        const fridges = {{{json heladeras}}};
+    </script>
+    <script>(g => {
+        var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
+                m = document, b = window;
+        b = b[c] || (b[c] = {});
+        var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
+                u = () => h || (h = new Promise(async (f, n) => {
+                    await (a = m.createElement("script"));
+                    e.set("libraries", [...r] + "");
+                    for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                    e.set("callback", c + ".maps." + q);
+                    a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                    d[q] = f;
+                    a.onerror = () => h = n(Error(p + " could not load."));
+                    a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                    m.head.append(a)
+                }));
+        d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+    })
+    ({key: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg", v: "weekly"});</script>
+    <script>
+        let map;
+        let markers = {};
+        let currentSelection = 'origin';
+
+        async function initMap() {
+            const {Map} = await google.maps.importLibrary("maps");
+            const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
+
+            map = new Map(document.getElementById("map"), {
+                center: {lat: -34.6078, lng: -58.4462},
+                zoom: 12.3,
+                mapId: "4504f8b37365c3d0"
+            });
+
+            fridges.forEach(fridge => {
+                const marker = new AdvancedMarkerElement({
+                    map,
+                    position: {lat: parseFloat(fridge.latitude), lng: parseFloat(fridge.longitude)},
+                    title: fridge.name,
+                });
+
+                marker.addListener("click", () => {
+                    selectFridge(fridge);
+                });
+                markers[fridge.id] = marker;
+            });
+
+        }
+
+        function selectFridge(fridge) {
+            if (currentSelection === 'origin') {
+                document.getElementById("selectedOrigin").textContent = fridge.name;
+                document.getElementById("originFridge").value = fridge.name;
+                document.getElementById("originFridgeId").value = fridge.id;
+            } else {
+                document.getElementById("selectedDestination").textContent = fridge.name;
+                document.getElementById("destinationFridge").value = fridge.name;
+                document.getElementById("destinationFridgeId").value = fridge.id;
+            }
+        }
+
+        // Event listeners para los botones de selección
+        document.getElementById('selectOrigin').addEventListener('change', function () {
+            currentSelection = 'origin';
+        });
+
+        document.getElementById('selectDestination').addEventListener('change', function () {
+            currentSelection = 'destination';
+        });
+
+        // Inicializar el mapa
+        initMap();
+    </script>
+{{/block}}

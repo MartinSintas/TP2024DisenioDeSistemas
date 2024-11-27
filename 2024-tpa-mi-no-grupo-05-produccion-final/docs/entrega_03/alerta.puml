@@ -1,0 +1,15 @@
+@startuml
+class Alerta {
+    - fechaReporteDelIncidente: LocalDateTime
+    - heladera: Heladera
+    - tipoAlerta: TipoAlerta
+}
+
+enum TipoAlerta {
+    TEMPERATURA
+    FRAUDE
+    DESCONEXION
+}
+
+Alerta -> TipoAlerta
+@enduml

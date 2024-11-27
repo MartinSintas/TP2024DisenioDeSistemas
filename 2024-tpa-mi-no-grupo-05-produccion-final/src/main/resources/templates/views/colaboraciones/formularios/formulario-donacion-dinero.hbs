@@ -1,0 +1,93 @@
+{{> templates/base }}
+{{#block "contenido"}}
+    <section class="container my-5">
+        <h2 class="text-center mb-4">Donación de dinero</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <form action="/donacion-dinero" method="POST">
+                            <!-- Monto de la donación -->
+                            <div class="mb-4">
+                                <label for="amount" class="form-label">Monto a donar</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="amount" name="amount" required
+                                           min="1" step="0.01" placeholder="0.00">
+                                </div>
+                            </div>
+
+                            <!-- Frecuencia de donación -->
+                            <div class="mb-4">
+                                <label class="form-label">Frecuencia de donación</label>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="frequency" id="oneTime"
+                                           value="oneTime" checked>
+                                    <label class="form-check-label" for="oneTime">
+                                        Única vez
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="frequency" id="recurring"
+                                           value="recurring">
+                                    <label class="form-check-label" for="recurring">
+                                        Recurrente
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Número de días (visible solo para donaciones recurrentes) -->
+                            <div class="mb-4" id="daysInputContainer" style="display: none;">
+                                <label for="days" class="form-label">Repetir cada (días)</label>
+                                <input type="number" class="form-control" id="days" name="days" min="1"
+                                       placeholder="Número de días">
+                            </div>
+
+                            <!-- Botón de envío -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    Realizar Donación
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Nota informativa -->
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            ⚠️ Información importante
+                        </h6>
+                        <p class="card-text small mb-0">
+                            Las donaciones recurrentes pueden cancelarse en cualquier momento desde tu perfil.
+                            Recibirás un comprobante por email después de cada donación procesada.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const frequencyInputs = document.querySelectorAll('input[name="frequency"]');
+            const daysInputContainer = document.getElementById('daysInputContainer');
+            const daysInput = document.getElementById('days');
+
+            frequencyInputs.forEach(input => {
+                input.addEventListener('change', function () {
+                    if (this.value === 'oneTime') {
+                        daysInputContainer.style.display = 'none';
+                        daysInput.removeAttribute('required');
+                    } else {
+                        daysInputContainer.style.display = 'block';
+                        daysInput.setAttribute('required', 'required');
+                        daysInput.value = ''; // Limpiar el valor previo
+                        daysInput.focus(); // Enfocar el campo para facilitar la entrada
+                    }
+                });
+            });
+        });
+    </script>
+{{/block}}

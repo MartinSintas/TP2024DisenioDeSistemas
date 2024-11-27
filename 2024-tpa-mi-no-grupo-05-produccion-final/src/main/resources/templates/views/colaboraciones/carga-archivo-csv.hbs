@@ -1,0 +1,94 @@
+{{> templates/base}}
+
+{{#block "contenido"}}
+    <section class="container mt-5">
+        <h1 class="mb-4">Cargar Archivo CSV de Colaboraciones</h1>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Subir Archivo CSV</h5>
+                        <!-- Formulario para cargar el archivo .txt que contiene el CSV -->
+                        <form action="/carga-archivo-colaboraciones" method="POST" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="csvfile" class="form-label">Selecciona un archivo CSV (.txt):</label>
+                                <!-- Aquí se acepta un archivo .txt -->
+                                <input class="form-control" type="file" name="csvfile" id="csvfile" accept=".txt" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Subir archivo</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Formato del CSV</h5>
+                        <p>El archivo CSV debe tener las siguientes columnas:</p>
+                        <ul>
+                            <li>Tipo Doc</li>
+                            <li>Documento (DNI, LE, LC, PASAPORTE)</li>
+                            <li>Nombre</li>
+                            <li>Apellido</li>
+                            <li>Mail</li>
+                            <li>Fecha de colaboración (dd/mm/aaaa)</li>
+                            <li>Forma de colaboración</li>
+                            <li>Cantidad</li>
+                        </ul>
+                        <p>Las formas de colaboración válidas son:</p>
+                        <ul>
+                            <li>DINERO</li>
+                            <li>DONACION_VIANDAS</li>
+                            <li>REDISTRIBUCION_VIANDAS</li>
+                            <li>ENTREGA_TARJETAS</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultadosProcesamiento" class="mt-5" style="display: none;">
+            <h2>Resultados del Procesamiento</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Resumen</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Total de registros: <span id="totalRegistros">0</span></li>
+                                <li class="list-group-item">Usuarios existentes: <span id="usuariosExistentes">0</span></li>
+                                <li class="list-group-item">Nuevos usuarios creados: <span id="nuevosUsuarios">0</span></li>
+                                <li class="list-group-item">Colaboraciones registradas: <span id="colaboracionesRegistradas">0</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Detalles</h5>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Documento</th>
+                                        <th>Estado</th>
+                                        <th>Colaboración</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="detallesTabla">
+                                    <!-- Los detalles se llenarán dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{{/block}}

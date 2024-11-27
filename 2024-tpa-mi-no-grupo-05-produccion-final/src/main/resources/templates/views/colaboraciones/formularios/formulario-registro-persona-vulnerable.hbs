@@ -1,0 +1,243 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section class="container my-5">
+        <h2 class="text-center mb-4">Registro de Persona Vulnerable</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-body">
+                        <form action="/personas-vulnerables/registrar" method="POST">
+                            <!-- Nombre completo -->
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre Completo</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                            </div>
+
+                            <!-- Fecha de nacimiento -->
+                            <div class="mb-3">
+                                <label for="birthDate" class="form-label">Fecha de Nacimiento</label>
+                                <input type="date" class="form-control" id="birthDate" name="birthDate" required>
+                            </div>
+
+                            <!-- Situación de vivienda -->
+                            <div class="mb-3">
+                                <label class="form-label">Situación de Vivienda</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="housingStatus" id="homeless"
+                                           value="homeless" required>
+                                    <label class="form-check-label" for="homeless">
+                                        En situación de calle
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="housingStatus"
+                                           id="hasAddress" value="hasAddress">
+                                    <label class="form-check-label" for="hasAddress">
+                                        Posee domicilio
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Dirección y Mapa (condicional) -->
+                            <div id="addressSection" style="display: none;">
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">Domicilio</label>
+                                    <input type="text" class="form-control" id="address" name="address">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Selecciona la ubicación en el mapa</label>
+                                    <div id="map" style="height: 300px; width: 100%;"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="latitude" class="form-label">Latitud</label>
+                                    <input type="text" class="form-control" id="latitude" name="latitude" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="longitude" class="form-label">Longitud</label>
+                                    <input type="text" class="form-control" id="longitude" name="longitude"
+                                           readonly>
+                                </div>
+                            </div>
+
+                            <!-- Tipo de documento -->
+                            <div class="mb-3">
+                                <label for="documentType" class="form-label">Tipo de Documento</label>
+                                <select class="form-select" id="documentType" name="documentType" required>
+                                    <option value="">Seleccione un tipo</option>
+                                    <option value="DNI">DNI</option>
+                                    <option value="PASAPORTE">PASAPORTE</option>
+                                    <option value="NO_POSEE">No posee</option>
+                                </select>
+                            </div>
+
+                            <!-- Número de documento -->
+                            <div class="mb-3" id="documentNumberField">
+                                <label for="documentNumber" class="form-label">Número de Documento</label>
+                                <input type="text" class="form-control" id="documentNumber" name="documentNumber">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">¿Posee menores a cargo?</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="hasMinors" id="hasMinorsYes"
+                                           value="yes" required>
+                                    <label class="form-check-label" for="hasMinorsYes">Sí</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="hasMinors" id="hasMinorsNo"
+                                           value="no">
+                                    <label class="form-check-label" for="hasMinorsNo">No</label>
+                                </div>
+                            </div>
+
+                            <!-- Campos de menores a cargo -->
+                            <div id="minorsSection" style="display: none;">
+                                <div id="minorsContainer">
+                                    <!-- Se agregarán los campos de menores aquí dinámicamente -->
+                                </div>
+                                <button type="button" class="btn btn-secondary" id="addMinor">Agregar Menor</button>
+                            </div>
+
+                            <script>
+                                // Mostrar/ocultar sección de menores
+                                document.querySelectorAll('input[name="hasMinors"]').forEach((elem) => {
+                                    elem.addEventListener("change", function (event) {
+                                        var minorsSection = document.getElementById("minorsSection");
+                                        minorsSection.style.display = event.target.value === "yes" ? "block" : "none";
+                                    });
+                                });
+
+                                // Función para agregar campos de menores
+                                document.getElementById('addMinor').addEventListener('click', function () {
+                                    var minorsContainer = document.getElementById('minorsContainer');
+                                    var index = minorsContainer.children.length;  // Contar cuántos menores ya hay
+
+                                    var minorFields = `
+                                        <div class="minor-fields mb-3">
+                                            <h4>Menor ${index + 1}</h4>
+                                            <div class="mb-3">
+                                                <label for="minorName${index}" class="form-label">Nombre</label>
+                                                <input type="text" class="form-control" id="minorName${index}" name="minorName" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="minorBirthDate${index}" class="form-label">Fecha de Nacimiento</label>
+                                                <input type="date" class="form-control" id="minorBirthDate${index}" name="minorBirthDate" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="minorDocumentType${index}" class="form-label">Tipo de Documento</label>
+                                                <select class="form-select" id="minorDocumentType${index}" name="minorDocumentType" required>
+                                                    <option value="">Seleccione un tipo</option>
+                                                    <option value="dni">DNI</option>
+                                                    <option value="passport">Pasaporte</option>
+                                                    <option value="other">Otro</option>
+                                                    <option value="none">No posee</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="minorDocumentNumber${index}" class="form-label">Número de Documento</label>
+                                                <input type="text" class="form-control" id="minorDocumentNumber${index}" name="minorDocumentNumber">
+                                            </div>
+                                        </div>
+                                    `;
+
+                                    minorsContainer.insertAdjacentHTML('beforeend', minorFields);
+                                });
+                            </script>
+
+                            <!-- Número de tarjeta -->
+                            <div class="mb-3">
+                                <label for="cardNumber" class="form-label">Número de Tarjeta de Acceso</label>
+                                <input type="text" class="form-control" id="cardNumber" name="cardNumber" required pattern="\d{11}" title="El número de tarjeta debe tener 11 dígitos">
+                                <div class="form-text">Debe ser un número de 11 dígitos.</div>
+                            </div>
+
+                            <!-- Botón de envío -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Registrar Persona Vulnerable</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>(g => {
+        var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
+                m = document, b = window;
+        b = b[c] || (b[c] = {});
+        var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
+                u = () => h || (h = new Promise(async (f, n) => {
+                    await (a = m.createElement("script"));
+                    e.set("libraries", [...r] + "");
+                    for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                    e.set("callback", c + ".maps." + q);
+                    a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                    d[q] = f;
+                    a.onerror = () => h = n(Error(p + " could not load."));
+                    a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                    m.head.append(a)
+                }));
+        d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+    })
+    ({key: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg", v: "weekly"});</script>
+    <script>
+        let map;
+        let marker;
+
+        async function initMap() {
+            const {Map} = await google.maps.importLibrary("maps");
+            const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
+
+            map = new Map(document.getElementById("map"), {
+                center: {lat: -34.6078, lng: -58.4462},
+                zoom: 12,
+                mapId: "4504f8b37365c3d0"
+            });
+
+            map.addListener("click", (event) => {
+                placeMarker(event.latLng, AdvancedMarkerElement);
+            });
+        }
+
+        function placeMarker(latLng, AdvancedMarkerElement) {
+            if (marker) {
+                marker.setMap(null);
+            }
+
+            marker = new AdvancedMarkerElement({
+                position: latLng,
+                map: map,
+                title: "Ubicación seleccionada"
+            });
+
+            document.getElementById("latitude").value = latLng.lat().toFixed(6);
+            document.getElementById("longitude").value = latLng.lng().toFixed(6);
+        }
+
+        // Mostrar/ocultar sección de dirección y mapa
+        document.querySelectorAll('input[name="housingStatus"]').forEach((elem) => {
+            elem.addEventListener("change", function (event) {
+                var addressSection = document.getElementById("addressSection");
+                addressSection.style.display = event.target.value === "hasAddress" ? "block" : "none";
+                if (event.target.value === "hasAddress" && !map) {
+                    initMap();
+                }
+            });
+        });
+
+        // Mostrar/ocultar campo de número de documento
+        document.getElementById('documentType').addEventListener('change', function () {
+            var documentNumberField = document.getElementById("documentNumberField");
+            documentNumberField.style.display = this.value !== "none" ? "block" : "none";
+        });
+
+        // Mostrar/ocultar campo de cantidad de menores
+        document.querySelectorAll('input[name="hasMinors"]').forEach((elem) => {
+            elem.addEventListener("change", function (event) {
+                var minorsCountField = document.getElementById("minorsCountField");
+                minorsCountField.style.display = event.target.value === "yes" ? "block" : "none";
+            });
+        });
+    </script>
+
+{{/block}}

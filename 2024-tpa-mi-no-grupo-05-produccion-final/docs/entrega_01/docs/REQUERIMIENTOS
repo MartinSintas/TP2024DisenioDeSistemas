@@ -1,0 +1,47 @@
+REQUERIMIENTOS ENTREGA 1:
+
+FINALIZADO:
+--Requerimientos de UI/UX
+Se debe poder visualizar un mapa donde sea fácil de observar la ubicación de las heladeras.
+--Requerimientos de seguridad:
+El sistema debe permitir el registro de usuarios. Por el momento sólo se requiere guardar usuario y contraseña. Esta responsabilidad más adelante será delegada en un componente específico.
+Siguiendo las recomendaciones del OWASP (Proyecto Abierto de Seguridad en Aplicaciones Web), que se ha constituido en un estándar de facto para la seguridad, se pide:
+No utilice credenciales por defecto en su software, particularmente en el caso de administradores.
+Implemente controles contra contraseñas débiles. Cuando el usuario ingrese una nueva clave, la misma puede verificarse contra la lista del Top 10.000 de peores contraseñas.
+Alinear la política de longitud, complejidad y rotación de contraseñas con las recomendaciones de la Sección 5.1.1.2 para Secretos Memorizados de la Guía NIST 800-63
+
+
+FALTA REVISAR:
+    Se debe permitir el alta, baja y modificación de colaboradores
+    Se debe permitir realizar colaboraciones
+    Se debe permitir ingresar viandas a la heladera (como una forma de contribución)
+        //creo que esto es lo de donacionVianda
+    Se debe permitir el alta de personas en situación vulnerable
+        //esto queda con RegistroAltaUsuario
+    Se debe permitir el alta, baja y modificación de heladeras
+        //ESTO CREO QUE PUEDE HACERSE DE MANERA GENERICA CON "RegistroAltaUsuario"
+        //Porque crea objetos (cualquier tipo) y listo despues los guarda
+
+FALTA HACER:
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+REQUERIMIENTOS  ENTREGA 2:
+
+FINALIZADO:
+
+FALTA_REVISAR:
+Se debe permitir que los colaboradores registren a las personas en situación vulnerable.
+Se debe permitir el alta,baja, modificación de técnicos.
+Se debe permitir conocer el estado en tiempo real de cada heladera.
+    //esto es lo de la temperatura creo
+Se debe permitir solicitar la recomendación de puntos de colocación de las heladeras.
+    //no se conectar js y java
+
+FALTA_HACER:
+Se debe permitir asegurar trazabilidad y auditoría en el manejo de las diferentes tarjetas.
+    //?????????????
+Se debe permitir calcular el puntaje de los colaboradores y realizar el canje por los productos y/o servicios disponibles.
+Se debe permitir que las empresas ofrezcan productos y/o servicios como una nueva forma de colaboración.
+Se debe permitir la carga masiva de colaboraciones.
+    //todo tuyo tincho
+

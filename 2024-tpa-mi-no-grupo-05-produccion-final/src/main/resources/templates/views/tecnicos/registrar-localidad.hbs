@@ -1,0 +1,84 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section class="container mt-5">
+        <h1 class="mb-4">Registro de Heladeras</h1>
+        <div class="row">
+            <div class="col-md-8">
+                <div id="map" style="height: 500px; width: 100%; border: 2px solid black;"></div>
+            </div>
+            <div class="col-md-4">
+                <div id="fridgeRegistrationForm" class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Registrar Nueva Heladera</h5>
+                        <form action="/registro/localidad" method="POST" id="createFridgeForm">
+                            <div class="mb-3">
+                                <label for="fridgeName" class="form-label">Nombre de la Localidad</label>
+                                <input type="text" class="form-control" id="nombreLoc" name="nombreL" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fridgeCapacity" class="form-label">Nombre de la Provincia</label>
+                                <input type="text" class="form-control" id="provinciaLoc" name="provinciaLoc" min="1" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Registrar Localidad</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let map;
+
+        function initMap() {
+            const mapOptions = {
+                center: { lat: -34.6078, lng: -58.4462 }, // Coordenadas iniciales
+                zoom: 12.3,
+            };
+
+            // Crear el mapa en el elemento con id "map"
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            // Agregar evento de clic en el mapa
+            map.addListener('click', (event) => {
+                const lat = event.latLng.lat();
+                const lng = event.latLng.lng();
+
+                // Llama a la función para obtener y mostrar el nombre de localidad y provincia
+                getAddress(lat, lng);
+            });
+        }
+
+        async function getAddress(lat, lng) {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data && data.address) {
+                    // Obtener el nombre de la localidad y de la provincia
+                    const locality = data.address.neighbourhood || data.address.suburb || data.address.city || data.address.town || data.address.village || "Localidad no encontrada";
+                    const province = data.address.state || "Provincia no encontrada";
+
+                    // Completar los campos de localidad y provincia en el formulario
+                    document.getElementById('nombreLoc').value = locality;
+                    document.getElementById('provinciaLoc').value = province;
+                } else {
+                    // Manejo de caso en el que no se encuentra la dirección
+                    document.getElementById('nombreLoc').value = "Nombre no encontrado";
+                    document.getElementById('provinciaLoc').value = "Provincia no encontrada";
+                }
+            } catch (error) {
+                console.error("Error al obtener la dirección:", error);
+                // Manejo de error en caso de que la solicitud falle
+                document.getElementById('nombreLoc').value = "Error al obtener el nombre";
+                document.getElementById('provinciaLoc').value = "Error al obtener la provincia";
+            }
+        }
+
+        initMap();
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap" async defer></script>
+{{/block}}

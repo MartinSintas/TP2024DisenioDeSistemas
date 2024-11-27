@@ -1,0 +1,139 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section class="container mt-5">
+        <h1 class="mb-4">Gestión de Personas Jurídicas</h1>
+
+        <!-- Botón para crear nueva persona jurídica -->
+        <div class="mb-3">
+            <a href="/registrar-persona-juridica" class="btn btn-success">Registrar Nueva Persona Jurídica</a>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Razón Social</th>
+                <th>Tipo Jurídico</th>
+                <th>Rubro</th>
+                <th>Medios de Contacto</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Ejemplo de persona jurídica 1 -->
+            <tr>
+                <td>1</td>
+                <td>Empresa XYZ S.A.</td>
+                <td>EMPRESA</td>
+                <td>Tecnología</td>
+                <td>info@xyz.com, +54 11 1234-5678</td>
+                <td>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#editLegalEntityModal">Editar
+                    </button>
+                    <button class="btn btn-sm btn-danger">Eliminar</button>
+                </td>
+            </tr>
+            <!-- Ejemplo de persona jurídica 2 -->
+            <tr>
+                <td>2</td>
+                <td>Fundación ABC</td>
+                <td>ONG</td>
+                <td>Educación</td>
+                <td>contacto@fundacionabc.org</td>
+                <td>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#editLegalEntityModal">Editar
+                    </button>
+                    <button class="btn btn-sm btn-danger">Eliminar</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Modal para editar persona jurídica -->
+        <div class="modal fade" id="editLegalEntityModal" tabindex="-1" aria-labelledby="editLegalEntityModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editLegalEntityModalLabel">Editar Persona Jurídica</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editLegalEntityForm">
+                            <input type="hidden" id="editLegalEntityId" value="1">
+                            <div class="mb-3">
+                                <label for="editRazonSocial" class="form-label">Razón Social</label>
+                                <input type="text" class="form-control" id="editRazonSocial" value="Empresa XYZ S.A."
+                                       required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editTipoJuridico" class="form-label">Tipo Jurídico</label>
+                                <select class="form-select" id="editTipoJuridico" required>
+                                    <option value="GUBERNAMENTAL">Gubernamental</option>
+                                    <option value="ONG">ONG</option>
+                                    <option value="EMPRESA" selected>Empresa</option>
+                                    <option value="INSTITUCION">Institución</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editRubro" class="form-label">Rubro</label>
+                                <input type="text" class="form-control" id="editRubro" value="Tecnología" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMediosContacto" class="form-label">Medios de Contacto</label>
+                                <div id="mediosContactoContainer">
+                                    <div class="input-group mb-2">
+                                        <select class="form-select" name="tipoContacto[]">
+                                            <option value="EMAIL">Email</option>
+                                            <option value="WHATSAPP">WhatsApp</option>
+                                        </select>
+                                        <input type="text" class="form-control" name="valorContacto[]"
+                                               placeholder="Valor del contacto">
+                                        <button type="button" class="btn btn-outline-secondary remove-contacto">-
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="addMedioContacto">
+                                    Agregar Medio de Contacto
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary">Guardar cambios</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const addMedioContactoBtn = document.getElementById('addMedioContacto');
+            const mediosContactoContainer = document.getElementById('mediosContactoContainer');
+
+            addMedioContactoBtn.addEventListener('click', function () {
+                const newMedioContacto = document.createElement('div');
+                newMedioContacto.classList.add('input-group', 'mb-2');
+                newMedioContacto.innerHTML = `
+                    <select class="form-select" name="tipoContacto[]">
+                        <option value="EMAIL">Email</option>
+                        <option value="WHATSAPP">WhatsApp</option>
+                    </select>
+                    <input type="text" class="form-control" name="valorContacto[]" placeholder="Valor del contacto">
+                    <button type="button" class="btn btn-outline-secondary remove-contacto">-</button>
+                `;
+                mediosContactoContainer.appendChild(newMedioContacto);
+            });
+
+            mediosContactoContainer.addEventListener('click', function (e) {
+                if (e.target && e.target.classList.contains('remove-contacto')) {
+                    e.target.closest('.input-group').remove();
+                }
+            });
+        });
+    </script>
+{{/block}}

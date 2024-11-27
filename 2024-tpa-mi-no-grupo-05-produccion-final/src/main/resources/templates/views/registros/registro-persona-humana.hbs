@@ -1,0 +1,206 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">Registro de Persona Humana</h2>
+                        <form action="/registro/persona-humana" method="POST">
+                            <div class="mb-3">
+                                <label for="usuario" class="form-label">Usuario *</label>
+                                <input type="text" class="form-control" id="usuario" name="usuario" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contrasena" class="form-label">Contraseña *</label>
+                                <input type="password" class="form-control" id="contrasena" name="contrasena" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre *</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="apellido" class="form-label">Apellido *</label>
+                                <input type="text" class="form-control" id="apellido" name="apellido" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tipoDocumento" class="form-label">Tipo de Documento *</label>
+                                <select class="form-select" id="tipoDocumento" name="tipoDocumento" required>
+                                    <option value="">Seleccione un tipo de documento</option>
+                                    <option value="DNI">DNI</option>
+                                    <option value="LE">LE</option>
+                                    <option value="LC">LC</option>
+                                    <option value="PASAPORTE">Pasaporte</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="numeroDocumento" class="form-label">Número de Documento *</label>
+                                <input type="text" class="form-control" id="numeroDocumento" name="numeroDocumento"
+                                       required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="medioContacto" class="form-label">Medio de Contacto *</label>
+                                <select class="form-select" id="medioContacto" name="medioContacto" required>
+                                    <option value="">Seleccione un medio de contacto</option>
+                                    <option value="EMAIL">Correo Electrónico</option>
+                                    <option value="TELEGRAM">Telegram</option>
+                                    <option value="WHATSAPP">WhatsApp</option>
+                                </select>
+                            </div>
+                            <div class="mb-3" id="contactoValorContainer">
+                                <!-- El campo de entrada para el valor del contacto se generará dinámicamente aquí -->
+                            </div>
+                            <div class="mb-3">
+                                <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento (opcional)</label>
+                                <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Dirección (opcional)</label>
+                                <div id="map" style="height: 300px; width: 100%;"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="latitude" class="form-label">Latitud</label>
+                                <input type="text" class="form-control" id="latitude" name="latitude" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="longitude" class="form-label">Longitud</label>
+                                <input type="text" class="form-control" id="longitude" name="longitude" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Formas de Colaborar *</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="DONAR_VIANDAS"
+                                           id="donarViandas" name="formasColaborar">
+                                    <label class="form-check-label" for="donarViandas">
+                                        Donar Viandas
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="DONAR_DINERO"
+                                           id="donarDinero" name="formasColaborar">
+                                    <label class="form-check-label" for="donarDinero">
+                                        Donar Dinero
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="REGISTRAR_PERSONA_VULNERABLE"
+                                           id="registrarPersona" name="formasColaborar">
+                                    <label class="form-check-label" for="registrarPersona">
+                                        Registrar Persona Vulnerable
+                                    </label>
+                                </div>
+                            </div>
+                            {{#if enunciados.length}}
+                                {{#each enunciados}}
+                                    <div class="mb-3">
+                                        <label for="{{this.name}}" class="form-label">{{this.enunciado}}</label>
+                                        <input type="text" class="form-control" id="{{this.name}}" name="{{this.name}}" required>
+                                    </div>
+                                {{/each}}
+                            {{/if}}
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Registrarse</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        (g => {
+            var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
+                    m = document, b = window;
+            b = b[c] || (b[c] = {});
+            var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
+                    u = () => h || (h = new Promise(async (f, n) => {
+                        await (a = m.createElement("script"));
+                        e.set("libraries", [...r] + "");
+                        for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                        e.set("callback", c + ".maps." + q);
+                        a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                        d[q] = f;
+                        a.onerror = () => h = n(Error(p + " could not load."));
+                        a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                        m.head.append(a)
+                    }));
+            d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+        })({
+            key: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg",
+            v: "weekly"
+        });
+    </script>
+    <script>
+        let map;
+        let marker;
+
+        async function initMap() {
+            const {Map} = await google.maps.importLibrary("maps");
+            const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
+
+            map = new Map(document.getElementById("map"), {
+                center: {lat: -34.6078, lng: -58.4462},
+                zoom: 12,
+                mapId: "4504f8b37365c3d0"
+            });
+
+            map.addListener("click", (event) => {
+                placeMarker(event.latLng, AdvancedMarkerElement);
+            });
+        }
+
+        function placeMarker(latLng, AdvancedMarkerElement) {
+            if (marker) {
+                marker.setMap(null);
+            }
+
+            marker = new AdvancedMarkerElement({
+                position: latLng,
+                map: map,
+                title: "Ubicación seleccionada"
+            });
+
+            document.getElementById("latitude").value = latLng.lat().toFixed(6);
+            document.getElementById("longitude").value = latLng.lng().toFixed(6);
+        }
+
+        // Inicializar el mapa
+        initMap();
+
+        // Manejar la visualización dinámica del campo de valor de contacto
+        document.getElementById('medioContacto').addEventListener('change', function () {
+            const container = document.getElementById('contactoValorContainer');
+            const selectedOption = this.value;
+            let inputHtml = '';
+
+            if (selectedOption === 'EMAIL') {
+                inputHtml = '<input type="email" class="form-control" id="contactoValor" name="contactoValor" required placeholder="Ingrese su correo electrónico">';
+            } else if (selectedOption === 'WHATSAPP') {
+                inputHtml = '<input type="tel" class="form-control" id="contactoValor" name="contactoValor" required placeholder="Ingrese su número">';
+            } else if (selectedOption === "TELEGRAM") {
+                inputHtml = '<input type="text" class="form-control" id="contactoValor" name="contactoValor" required placeholder="Ingrese su chat ID de Telegram">';
+            }
+
+            container.innerHTML = inputHtml;
+        });
+
+        // Función para agregar dinámicamente nuevas formas de colaborar
+        function agregarFormaColaborar(nombre) {
+            const container = document.getElementById('formasColaborarDinamicas');
+            const newCheckbox = document.createElement('div');
+            newCheckbox.className = 'form-check';
+            newCheckbox.innerHTML = `
+                <input class="form-check-input" type="checkbox" value="${nombre}" id="${nombre}" name="formasColaborar">
+                <label class="form-check-label" for="${nombre}">
+                    ${nombre}
+                </label>
+            `;
+            container.appendChild(newCheckbox);
+        }
+
+        // Ejemplo de cómo se podrían agregar formas de colaborar dinámicamente
+        // Esto se podría hacer basado en datos recibidos del servidor
+        // agregarFormaColaborar('NUEVA_FORMA_DE_COLABORAR');
+    </script>
+{{/block}}

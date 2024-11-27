@@ -1,0 +1,26 @@
+@startuml
+class FallaTecnica {
+ - heladera: Heladera
+ - colaborador: PersonaHumana
+ - descripcion: String
+ - foto: String
+ - tecnicoAsignado: Tecnico
+ - visitas: List<VisitaTecnico>
+ - estado: EstadoFallaTecnica
+}
+
+enum EstadoFallaTecnica {
+    PENDIENTE,
+    SOLUCIONADA
+}
+
+class VisitaTecnico {
+ - fechaVisita: Date
+ - tecnico: Tecnico
+ - fallaTecnica: FallaTecnica
+}
+
+FallaTecnica --> "*" VisitaTecnico
+VisitaTecnico --> FallaTecnica
+FallaTecnica --> EstadoFallaTecnica
+@enduml

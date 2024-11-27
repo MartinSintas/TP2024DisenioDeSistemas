@@ -1,0 +1,35 @@
+{{> templates/base }}
+{{#block "contenido"}}
+    <div class="container mt-5">
+        <h2>Mis Ofertas</h2>
+
+        {{#if ofertas}}
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {{#each ofertas}}
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="/imagenes/{{oferta.imagen}}" alt="{{oferta.nombre}}" class="card-img-top">
+                            <div class="card-body">
+                                <h5 class="card-title">{{this.nombre}}</h5>
+                                <p class="card-text">
+                                    Puntos necesarios: <strong>{{this.puntosNecesarios}}</strong>
+                                </p>
+                                <p class="card-text">
+                                    Rubro: <strong>{{this.rubro.nombre}}</strong>
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-primary">Ver Detalles</button>
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        {{else}}
+            <p class="text-center">No tenes ofertas disponibles aún.</p>
+            <div class="mt-4">
+                <a href="/crear-oferta" class="btn btn-success">Crear Nueva Oferta</a>
+            </div>
+        {{/if}}
+    </div>
+{{/block}}

@@ -1,0 +1,47 @@
+{{> templates/base }}
+{{#block "contenido"}}
+<section class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card border-primary">
+                <div class="card-body">
+                    <h2 class="card-title text-primary mb-4 text-center">Lista de Personas Humanas</h2>
+                    {{#if personas}}
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Apellido</th>
+                                        <th>Nombre</th>
+                                        <th>Nro. Documento</th>
+                                        <th>Puntos Acumulados</th>
+                                        <th>Tipo Documento</th>
+                                        <th>Fecha de Nacimiento</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each personas}}
+                                        <tr>
+                                            <td>{{apellido}}</td>
+                                            <td>{{nombre}}</td>
+                                            <td>{{nroDocumento}}</td>
+                                            <td>{{puntosAcumulados}}</td>
+                                            <td>{{tipoDocumento}}</td>
+                                            <td>{{fechaNacimiento}}</td>
+                                        </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                    {{else}}
+                        <p class="text-muted text-center">No hay personas registradas.</p>
+                    {{/if}}
+                    <div class="text-center mt-4">
+                        <a href="/" class="btn btn-primary">Volver al Inicio</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{{/block}}

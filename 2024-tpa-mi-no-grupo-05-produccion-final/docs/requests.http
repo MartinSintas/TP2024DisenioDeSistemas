@@ -1,0 +1,10 @@
+### Send POST request with json body
+POST https://api.telegram.org/bot7391494471:AAEtEhkMV6fmSWJqpKZLj6T-2nEKBsu_zZM/sendMessage
+Content-Type: application/json
+
+{
+  "chat_id": 964610424,
+  "text": "soy el notificador de telegram"
+}
+
+

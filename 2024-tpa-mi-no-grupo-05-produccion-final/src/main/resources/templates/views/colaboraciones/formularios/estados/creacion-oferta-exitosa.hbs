@@ -1,0 +1,34 @@
+{{> templates/base }}
+{{#block "contenido"}}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card text-center">
+                    <div class="card-header bg-success text-white">
+                        ¡Oferta Creada Exitosamente!
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">La oferta <strong>{{oferta.nombre}}</strong> ha sido creada exitosamente.</h5>
+                        <p class="card-text">
+                            Puntos necesarios para canjear: <strong>{{oferta.puntosNecesarios}}</strong> puntos.
+                        </p>
+                        <p class="card-text">
+                            Categoría: <strong>{{oferta.rubro.nombre}}</strong>
+                        </p>
+                        <p class="card-text">
+                            Imagen de la oferta:
+                        </p>
+                        <img src="/imagenes/{{oferta.imagen}}" alt="{{oferta.nombre}}" class="img-fluid mb-3" style="max-width: 200px;">
+                        <p>
+                            Oferta creada el {{fecha}}.
+                        </p>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <a href="/crear-oferta" class="btn btn-primary">Crear otra oferta</a>
+                        <a href="/canjear-ofertas" class="btn btn-secondary">Ver todas las ofertas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{{/block}}

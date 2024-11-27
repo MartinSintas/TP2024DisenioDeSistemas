@@ -1,0 +1,30 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section class="container mt-5">
+        <h1 class="mb-4">Registrar Modelo de Heladera</h1>
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div id="modelRegistrationForm" class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Formulario de Registro de Modelo</h5>
+                        <form action="/registro/modelo-heladera" method="POST" id="createModelForm">
+                            <div class="mb-3">
+                                <label for="detalle" class="form-label">Detalle del Modelo</label>
+                                <input type="text" class="form-control" id="detalle" name="detalle" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="temperaturaMaxima" class="form-label">Temperatura Máxima</label>
+                                <input type="number" class="form-control" id="temperaturaMaxima" name="temperaturaMaxima" step="0.1" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="temperaturaMinima" class="form-label">Temperatura Mínima</label>
+                                <input type="number" class="form-control" id="temperaturaMinima" name="temperaturaMinima" step="0.1" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Registrar Modelo</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{{/block}}

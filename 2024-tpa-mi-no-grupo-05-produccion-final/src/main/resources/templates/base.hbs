@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <title>🍱 Viandas Solidarias</title>
+</head>
+
+<body>
+<header class="mb-5">
+    <nav class="navbar navbar-expand-xl bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">🍱 Viandas Solidarias</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                {{#if tieneSesion}}
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                                {{#if esPersonaHumana}}
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"aria-expanded="false">Colaborá!</a>
+                                    <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/donacion-vianda">🍱 Donar viandas</a></li>
+                                    <li><a class="dropdown-item" href="/redistribucion-viandas">🏍️ Redistribuir viandas</a></li>
+                                    <li><a class="dropdown-item" href="/donacion-dinero">💵 Donar dinero</a></li>
+                                    <li><a class="dropdown-item" href="/personas-vulnerables/registrar">🤝 Registrar persona vulnerable</a></li>
+                                    </ul>
+                                {{/if}}
+                                {{#if esPersonaJuridica}}
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"aria-expanded="false">Colaborá!</a>
+                                    <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/registro/heladera">🏪 Colocar heladera</a></li>
+                                    <li><a class="dropdown-item" href="/registro-persona-vulnerable">🤝 Registrar persona vulnerable</a></li>
+                                    <li><a class="dropdown-item" href="/ofrecer-canjeable">💯 Ofrecer canjeable</a></li>
+                                    <li><a class="dropdown-item" href="/donacion-dinero">💵 Donar dinero</a></li>
+                                   </ul>
+                                   <li class="nav-item"><a class="nav-link" href="/visitas-heladeras">Ver visitas a heladeras</a></li>
+                                {{/if}}
+                                <li class="nav-item"><a class="nav-link" href="/mapa-heladeras">Ver heladeras</a></li>
+                                {{#if esTecnico}}
+                                    <li class="nav-item"><a class="nav-link" href="/mapa-incidentes">Ver incidentes</a></li>
+                                {{/if}}
+                                {{#if esAdministrador}}
+                                    <ul class="dropdown-menu">
+                                    <li> <a class="dropdown-item" href="/gestionar-tecnicos">Gestionar técnicos</a></li>
+                                    <li> <a class="dropdown-item" href="/gestionar-personas-humanas">Gestionar personas humanas</a></li>
+                                    <li> <a class="dropdown-item" href="/gestionar-personas-juridicas">Gestionar personasjurídicas</a></li>
+                                    <li> <a class="dropdown-item" href="/carga-archivo-colaboraciones">Cargar CSV Colaboraciones</a></li>
+                                    </ul>
+                                    <li class="nav-item"><a class="nav-link" href="/registro/tecnico">Registrar a un Técnico</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/visitas-heladeras">Ver visitas a heladeras</a></li>
+                                {{else}}
+                                    <li class="nav-item">
+                                        <a href="/canjear-ofertas" class="nav-link">
+                                            Canjear puntos
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/canjes-realizados" class="nav-link">
+                                            Ver canjes realizados
+                                        </a>
+                                    </li>
+                                    {{#if esPersonaJuridica}}
+                                        <li class="nav-item">
+                                            <a href="/ofertas-disponibles" class="nav-link">
+                                                Ver ofertas disponibles
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/ofertas-canjeadas" class="nav-link">
+                                                Ver ofertas canjeadas
+                                            </a>
+                                        </li>
+                                    {{/if}}
+                                {{/if}}
+                            <li class="nav-item"><a class="nav-link text-danger" href="/cerrar-sesion">Cerrar sesión</a></li>
+                        </li>
+                    </ul>
+                {{/if}}
+                {{#if noTieneSesion}}
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link text-primary fw-bold" href="/iniciar-sesion">Iniciar Sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-primary fw-bold" href="/registro">Registrarse</a>
+                        </li>
+                    </ul>
+                {{/if}}
+            </div>
+        </div>
+    </nav>
+</header>
+<main>
+    {{#block "contenido"}}
+    {{/block}}
+</main>
+<footer>
+
+</footer>
+
+<script src="/js/bootstrap.bundle.js"></script>
+</body>
+
+</html>

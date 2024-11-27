@@ -1,0 +1,161 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section class="container my-5">
+        <h2 class="text-center mb-4">Colocar Nueva Heladera</h2>
+        <div class="row">
+            <!-- Columna del mapa -->
+            <div class="col-lg-8 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Selecciona la Ubicación</h5>
+                        <div id="map" style="height: 500px; width: 100%;"></div>
+                        <p class="mt-2 text-muted small">Haz clic en el mapa para seleccionar la ubicación de la
+                            nueva heladera.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna del formulario -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Detalles de la Nueva Heladera</h5>
+                        <form action="/heladeras/nueva" method="POST">
+                            <!-- Nombre de la heladera -->
+                            <div class="mb-3">
+                                <label for="fridgeName" class="form-label">Nombre de la Heladera</label>
+                                <input type="text" class="form-control" id="fridgeName" name="fridgeName" required>
+                            </div>
+
+                            <!-- Coordenadas (se llenan automáticamente) -->
+                            <div class="mb-3">
+                                <label for="latitude" class="form-label">Latitud</label>
+                                <input type="text" class="form-control" id="latitude" name="latitude" readonly
+                                       required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="longitude" class="form-label">Longitud</label>
+                                <input type="text" class="form-control" id="longitude" name="longitude" readonly
+                                       required>
+                            </div>
+
+                            <!-- Capacidad -->
+                            <div class="mb-3">
+                                <label for="capacity" class="form-label">Capacidad (número de viandas)</label>
+                                <input type="number" class="form-control" id="capacity" name="capacity" min="1"
+                                       required>
+                            </div>
+
+                            <!-- Temperatura mínima -->
+                            <div class="mb-3">
+                                <label for="minTemperature" class="form-label">Temperatura Mínima (°C)</label>
+                                <input type="number" class="form-control" id="minTemperature" name="minTemperature"
+                                       step="0.1" required>
+                            </div>
+
+                            <!-- Temperatura máxima -->
+                            <div class="mb-3">
+                                <label for="maxTemperature" class="form-label">Temperatura Máxima (°C)</label>
+                                <input type="number" class="form-control" id="maxTemperature" name="maxTemperature"
+                                       step="0.1" required>
+                            </div>
+
+                            <!-- Descripción -->
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            </div>
+
+                            <!-- Botón de envío -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Colocar Heladera</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>(g => {
+        var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
+                m = document, b = window;
+        b = b[c] || (b[c] = {});
+        var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
+                u = () => h || (h = new Promise(async (f, n) => {
+                    await (a = m.createElement("script"));
+                    e.set("libraries", [...r] + "");
+                    for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                    e.set("callback", c + ".maps." + q);
+                    a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                    d[q] = f;
+                    a.onerror = () => h = n(Error(p + " could not load."));
+                    a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                    m.head.append(a)
+                }));
+        d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+    })
+    ({key: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg", v: "weekly"});</script>
+    <script>
+        let map;
+        let newFridgeMarker;
+        const FRIDGE_RADIUS = 1000; // Radio en metros
+
+        async function initMap() {
+            const {Map} = await google.maps.importLibrary("maps");
+            const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
+
+            map = new Map(document.getElementById("map"), {
+                center: {lat: -34.6078, lng: -58.4462},
+                zoom: 12,
+                mapId: "4504f8b37365c3d0"
+            });
+
+            const existingFridges = [
+                {position: {lat: -34.6594, lng: -58.4706}, title: "UTN FRBA - Sede Campus"},
+                {position: {lat: -34.5984, lng: -58.4215}, title: "UTN FRBA - Sede Medrano"}
+            ];
+
+            existingFridges.forEach(fridge => {
+                const marker = new AdvancedMarkerElement({
+                    map,
+                    position: fridge.position,
+                    title: fridge.title
+                });
+
+                // Agregar círculo para mostrar el radio
+                new google.maps.Circle({
+                    strokeColor: "#FF0000",
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: "#FF0000",
+                    fillOpacity: 0.35,
+                    map,
+                    center: fridge.position,
+                    radius: FRIDGE_RADIUS
+                });
+            });
+
+            map.addListener("click", (event) => {
+                placeNewFridgeMarker(event.latLng, AdvancedMarkerElement);
+            });
+        }
+
+        function placeNewFridgeMarker(latLng, AdvancedMarkerElement) {
+            if (newFridgeMarker) {
+                newFridgeMarker.setMap(null);
+            }
+
+            newFridgeMarker = new AdvancedMarkerElement({
+                position: latLng,
+                map: map,
+                title: "Nueva Heladera"
+            });
+
+            document.getElementById("latitude").value = latLng.lat().toFixed(6);
+            document.getElementById("longitude").value = latLng.lng().toFixed(6);
+        }
+
+        // Inicializar el mapa
+        initMap();
+    </script>
+{{/block}}

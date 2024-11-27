@@ -1,0 +1,51 @@
+{{> templates/base }}
+{{#block "contenido"}}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <h3>Canjes Realizados en Mis Ofertas</h3>
+                <table class="table table-striped mt-4">
+                    <thead>
+                    <tr>
+                        <th>Oferta</th>
+                        <th>Tipo documento</th>
+                        <th>Nro documento</th>
+                        <th>Nombre</th>
+                        <th>Puntos Utilizados</th>
+                        <th>Fecha de Canje</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{#each canjes}}
+                        <tr>
+                            <td>{{this.oferta.nombre}}</td>
+                            {{#if this.personaHumana}}
+                                <td>{{this.personaHumana.tipoDocumento}}</td>
+                                <td>{{this.personaHumana.nroDocumento}}</td>
+                                <td>{{this.personaHumana.nombre}} {{this.personaHumana.apellido}}</td>
+                            {{/if}}
+                            {{#if this.personaJuridica}}
+                                <td>CUIL</td>
+                                <td></td>
+                                <td>{{this.personaJuridica.razonSocial}}</td>
+                            {{/if}}
+                            <td>{{this.puntosUtilizados}}</td>
+                            <td>{{this.fecha}}</td>
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+
+                {{#if canjes.length}}
+                    <div class="text-center">
+                        <a href="/ofertas-disponibles" class="btn btn-primary mt-4">Volver a Mis Ofertas</a>
+                    </div>
+                {{else}}
+                    <div class="alert alert-info mt-4 text-center">
+                        No se han realizado canjes sobre tus ofertas aún.
+                    </div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+{{/block}}

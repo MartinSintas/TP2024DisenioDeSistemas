@@ -1,0 +1,151 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">Registro de Persona Jurídica</h2>
+                        <form action="/registro/persona-juridica" method="POST">
+                            <div class="mb-3">
+                                <label for="usuario" class="form-label">Usuario *</label>
+                                <input type="text" class="form-control" id="usuario" name="usuario" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contrasena" class="form-label">Contraseña *</label>
+                                <input type="password" class="form-control" id="contrasena" name="contrasena" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="razonSocial" class="form-label">Razón Social *</label>
+                                <input type="text" class="form-control" id="razonSocial" name="razonSocial" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tipoJuridico" class="form-label">Tipo Jurídico *</label>
+                                <select class="form-select" id="tipoJuridico" name="tipoJuridico" required>
+                                    <option value="">Seleccione el tipo jurídico</option>
+                                    <option value="EMPRESA">Empresa</option>
+                                    <option value="ONG">ONG</option>
+                                    <option value="FUNDACION">Fundación</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rubro" class="form-label">Rubro *</label>
+                                <input type="text" class="form-control" id="rubro" name="rubro" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="medioContacto" class="form-label">Medio de Contacto *</label>
+                                <select class="form-select" id="medioContacto" name="medioContacto" required>
+                                    <option value="">Seleccione un medio de contacto</option>
+                                    <option value="EMAIL">Correo Electrónico</option>
+                                    <option value="TELEGRAM">Telegram</option>
+                                    <option value="WHATSAPP">WhatsApp</option>
+                                </select>
+                            </div>
+                            <div class="mb-3" id="contactoValorContainer">
+                                <!-- El campo de entrada para el valor del contacto se generará dinámicamente aquí -->
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Dirección (opcional)</label>
+                                <div id="map" style="height: 300px; width: 100%;"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="latitude" class="form-label">Latitud</label>
+                                <input type="text" class="form-control" id="latitude" name="latitude" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="longitude" class="form-label">Longitud</label>
+                                <input type="text" class="form-control" id="longitude" name="longitude" readonly>
+                            </div>
+                            {{# each enunciados}}
+                                <div class="mb-3">
+                                    <label for="{{this.name}}" class="form-label">{{this.enunciado}}</label>
+                                    <input type="text" class="form-control" id="{{this.name}}" name="{{this.name}}" required>
+                                </div>
+                            {{/each}}
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Registrarse</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Google Maps Initialization
+        (g => {
+            var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
+                m = document, b = window;
+            b = b[c] || (b[c] = {});
+            var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
+                u = () => h || (h = new Promise(async (f, n) => {
+                    await (a = m.createElement("script"));
+                    e.set("libraries", [...r] + "");
+                    for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                    e.set("callback", c + ".maps." + q);
+                    a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                    d[q] = f;
+                    a.onerror = () => h = n(Error(p + " could not load."));
+                    a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                    m.head.append(a)
+                }));
+            d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+        })({
+            key: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg",
+            v: "weekly"
+        });
+
+        let map;
+        let marker;
+
+        async function initMap() {
+            const {Map} = await google.maps.importLibrary("maps");
+            const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
+
+            map = new Map(document.getElementById("map"), {
+                center: {lat: -34.6078, lng: -58.4462},
+                zoom: 12,
+                mapId: "4504f8b37365c3d0"
+            });
+
+            map.addListener("click", (event) => {
+                placeMarker(event.latLng, AdvancedMarkerElement);
+            });
+        }
+
+        function placeMarker(latLng, AdvancedMarkerElement) {
+            if (marker) {
+                marker.setMap(null);
+            }
+
+            marker = new AdvancedMarkerElement({
+                position: latLng,
+                map: map,
+                title: "Ubicación seleccionada"
+            });
+
+            document.getElementById("latitude").value = latLng.lat().toFixed(6);
+            document.getElementById("longitude").value = latLng.lng().toFixed(6);
+        }
+
+        initMap();
+
+        // Dynamic Contact Field
+        document.getElementById('medioContacto').addEventListener('change', function () {
+            const container = document.getElementById('contactoValorContainer');
+            const selectedOption = this.value;
+            let inputHtml = '';
+
+            if (selectedOption === 'EMAIL') {
+                inputHtml = '<input type="email" class="form-control" id="contactoValor" name="contactoValor" required placeholder="Ingrese su correo electrónico">';
+            } else if (selectedOption === 'WHATSAPP') {
+                inputHtml = '<input type="tel" class="form-control" id="contactoValor" name="contactoValor" required placeholder="Ingrese su número">';
+            } else if (selectedOption === 'TELEGRAM') {
+                inputHtml = '<input type="text" class="form-control" id="contactoValor" name="contactoValor" required placeholder="Ingrese su chat ID de Telegram">';
+            }
+
+            container.innerHTML = inputHtml;
+        });
+    </script>
+{{/block}}

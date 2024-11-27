@@ -1,0 +1,49 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section>
+        <h2 class="text-center mb-4">Lista de Incidentes</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <form action="/mapa-incidentes" method="POST" enctype="multipart/form-data">
+                                    <label for="localidadId" class="form-label">Incidente</label>
+
+                                    <div class="mb-3">
+                                        <select class="form-select" id="localidadId" name="incidente.id" required>
+                                            {{#each incidentes}}
+                                                    <option value="{{this.id}}"> {{this.estado_incidente}} a las {{this.fecha_incidente}}</option>
+                                            {{/each}}
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="fechaVisita" class="form-label">Fecha y Hora de Visita</label>
+                                        <input type="datetime-local" class="form-control" id="fechaVisita" name="fechaVisita" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="comentario" class="form-label">Comentario</label>
+                                        <textarea class="form-control" id="comentario" name="comentario" rows="3" required></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="imagen" class="form-label">Subir imagen</label>
+                                        <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*">
+                                    </div>
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="resuelto" name="resuelto">
+                                        <label class="form-check-label" for="resuelto">Incidente Resuelto</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Registrar Trabajo</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{{/block}}

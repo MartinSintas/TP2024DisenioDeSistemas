@@ -1,0 +1,112 @@
+{{> templates/base}}
+{{#block "contenido"}}
+    <section class="container mt-5">
+        <h1 class="mb-4">Gestión de Técnicos</h1>
+
+        <!-- Botón para crear nuevo técnico -->
+        <div class="mb-3">
+            <a href="/registrar-tecnico" class="btn btn-success">Registrar Nuevo Técnico</a>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Tipo de Documento</th>
+                <th>CUIL</th>
+                <th>Medio de Contacto</th>
+                <th>Ubicación</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Ejemplo de técnico 1 -->
+            <tr>
+                <td>1</td>
+                <td>Juan</td>
+                <td>Pérez</td>
+                <td>DNI</td>
+                <td>20-12345678-9</td>
+                <td>juan@email.com</td>
+                <td>Buenos Aires</td>
+                <td>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#editTechnicianModal">Editar
+                    </button>
+                    <button class="btn btn-sm btn-danger">Eliminar</button>
+                </td>
+            </tr>
+            <!-- Ejemplo de técnico 2 -->
+            <tr>
+                <td>2</td>
+                <td>María</td>
+                <td>González</td>
+                <td>PASAPORTE</td>
+                <td>27-98765432-1</td>
+                <td>maria@email.com</td>
+                <td>Córdoba</td>
+                <td>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#editTechnicianModal">Editar
+                    </button>
+                    <button class="btn btn-sm btn-danger">Eliminar</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Modal para editar técnico -->
+        <div class="modal fade" id="editTechnicianModal" tabindex="-1" aria-labelledby="editTechnicianModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editTechnicianModalLabel">Editar Técnico</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editTechnicianForm">
+                            <input type="hidden" id="editTechnicianId" value="1">
+                            <div class="mb-3">
+                                <label for="editNombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="editNombre" value="Juan" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editApellido" class="form-label">Apellido</label>
+                                <input type="text" class="form-control" id="editApellido" value="Pérez" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editTipoDocumento" class="form-label">Tipo de Documento</label>
+                                <select class="form-select" id="editTipoDocumento" required>
+                                    <option value="DNI" selected>DNI</option>
+                                    <option value="PASAPORTE">Pasaporte</option>
+                                    <option value="CEDULA">Cédula</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editCuil" class="form-label">CUIL</label>
+                                <input type="text" class="form-control" id="editCuil" value="20-12345678-9"
+                                       required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMedioContacto" class="form-label">Medio de Contacto</label>
+                                <input type="text" class="form-control" id="editMedioContacto"
+                                       value="juan@email.com">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editUbicacion" class="form-label">Ubicación</label>
+                                <input type="text" class="form-control" id="editUbicacion" value="Buenos Aires">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary">Guardar cambios</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{{/block}}
